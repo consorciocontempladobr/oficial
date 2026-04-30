@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário | Consórcio Contemplado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C; --gold-light: #E8C97A;
+    --dark: #0A0A0A; --dark2: #141414; --dark3: #1E1E1E;
+    --text: #F0EDE6; --muted: #7A7570;
+    --border: rgba(201,168,76,0.2); --success: #4CAF7D;
+  }
+  body {
+    background: var(--dark); color: var(--text);
+    font-family: 'DM Sans', sans-serif; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; top: -20%; right: -10%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  body::after {
+    content: ''; position: fixed; bottom: -20%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .wrapper { width: 100%; max-width: 600px; position: relative; }
+  .header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.6s ease both; }
+  .badge {
+    display: inline-block; background: rgba(201,168,76,0.12);
+    border: 1px solid var(--border); color: var(--gold-light);
+    font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
+    text-transform: uppercase; padding: 6px 16px;
+    border-radius: 100px; margin-bottom: 20px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px); font-weight: 900;
+    line-height: 1.15; color: var(--text); margin-bottom: 12px;
+  }
+  .header h1 span { color: var(--gold); display: block; }
+  .header p { color: var(--muted); font-size: 15px; font-weight: 300; line-height: 1.6; max-width: 420px; margin: 0 auto; }
+  .progress-wrap { margin-bottom: 36px; animation: fadeIn 0.6s 0.2s ease both; }
+  .progress-labels { display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .progress-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); transition: color 0.3s; }
+  .progress-label.active { color: var(--gold); }
+  .progress-track { height: 2px; background: var(--dark3); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 14%;
+  }
+  .form-card {
+    background: var(--dark2); border: 1px solid var(--border); border-radius: 20px;
+    padding: 40px; animation: fadeUp 0.6s 0.15s ease both;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+  .step { display: none; }
+  .step.active { display: block; animation: stepIn 0.4s ease both; }
+  @keyframes stepIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  .step-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .step-subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; font-weight: 300; }
+  .step-num { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; font-weight: 500; }
+  .field { margin-bottom: 20px; }
+  label {
+    display: block; font-size: 12px; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  input[type="text"], select {
+    width: 100%; background: var(--dark3); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 400; padding: 14px 18px; outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s; -webkit-appearance: none; appearance: none;
+  }
+  /* CPF input needs room for the icon */
+  #cpf { padding-right: 48px; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A7570' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center;
+    padding-right: 44px; cursor: pointer;
+  }
+  select option { background: #1E1E1E; }
+  input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
+  input::placeholder { color: var(--muted); opacity: 0.6; }
+  .input-wrap { position: relative; }
+  .cpf-icon {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 16px; pointer-events: none; transition: opacity 0.2s;
+  }
+  input.cpf-ok { border-color: var(--success) !important; box-shadow: 0 0 0 3px rgba(76,175,125,0.12) !important; }
+  .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .radio-group.cols-3 { grid-template-columns: repeat(3,1fr); }
+  @media(max-width: 480px) { .radio-group, .radio-group.cols-3 { grid-template-columns: 1fr 1fr; } .form-card { padding: 28px 20px; } }
+  .radio-card input { display: none; }
+  .radio-card label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 14px 10px; background: var(--dark3);
+    border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; cursor: pointer;
+    transition: all 0.2s; text-align: center; text-transform: none; letter-spacing: 0;
+    font-size: 13px; font-weight: 400; color: var(--muted); min-height: 72px;
+  }
+  .radio-card label .icon { font-size: 22px; }
+  .radio-card input:checked + label {
+    background: rgba(201,168,76,0.1); border-color: var(--gold);
+    color: var(--gold-light); box-shadow: 0 0 0 1px var(--gold);
+  }
+  .radio-card label:hover { border-color: rgba(201,168,76,0.4); color: var(--text); }
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-back {
+    background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 14px 24px;
+    border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .btn-back:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  .btn-next {
+    flex: 1; background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none; color: #0A0A0A; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; padding: 14px 28px; border-radius: 10px;
+    cursor: pointer; transition: all 0.25s; letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.35); }
+  .btn-next:active { transform: translateY(0); }
+  .disclaimer { margin-top: 20px; text-align: center; font-size: 11px; color: var(--muted); opacity: 0.6; line-height: 1.5; }
+  /* Success */
+  #success-screen { display: none; text-align: center; padding: 10px 0; animation: stepIn 0.5s ease both; }
+  .success-icon {
+    width: 80px; height: 80px; background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.35); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px; font-size: 36px;
+  }
+  #success-screen h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
+  #success-screen p { color: var(--muted); font-size: 15px; margin-bottom: 28px; line-height: 1.7; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .summary { background: var(--dark3); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; text-align: left; }
+  .summary-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; gap: 12px; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row span:first-child { color: var(--muted); white-space: nowrap; }
+  .summary-row span:last-child { color: var(--text); font-weight: 500; text-align: right; }
+  /* Errors */
+  .field-error { border-color: #e05252 !important; box-shadow: 0 0 0 3px rgba(224,82,82,0.1) !important; }
+  .error-msg { color: #e05252; font-size: 11px; margin-top: 6px; display: none; }
+  .error-msg.show { display: block; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="header">
+    <div class="badge">✦ Consórcio Contemplado</div>
+    <h1>Conquiste seu bem<span>sem juros, do seu jeito.</span></h1>
+    <p>Preencha as informações abaixo e um especialista entrará em contato com a melhor proposta para você.</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span class="progress-label active" id="lbl-1">Identificação</span>
+      <span class="progress-label" id="lbl-2">Financeiro</span>
+      <span class="progress-label" id="lbl-3">Objetivo</span>
+      <span class="progress-label" id="lbl-4">Perfil</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="form-card">
+    <div id="form-area">
+
+      <!-- STEP 1 -->
+      <div class="step active" id="step-1">
+        <div class="step-num">Passo 1 de 4</div>
+        <div class="step-title">Vamos nos conhecer?</div>
+        <div class="step-subtitle">Suas informações são 100% seguras e confidenciais.</div>
+
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name" />
+          <div class="error-msg" id="err-nome">Por favor, informe seu nome completo.</div>
+        </div>
+
+        <div class="field">
+          <label for="cpf">CPF</label>
+          <div class="input-wrap">
+            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="off" />
+            <span class="cpf-icon" id="cpf-icon"></span>
+          </div>
+          <div class="error-msg" id="err-cpf">CPF inválido. Verifique os números e tente novamente.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-next" onclick="nextStep(1)">Continuar <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step-2">
+        <div class="step-num">Passo 2 de 4</div>
+        <div class="step-title">Situação financeira</div>
+        <div class="step-subtitle">Isso nos ajuda a encontrar a carta certa para o seu perfil.</div>
+
+        <div class="field">
+          <label>Qual é a sua renda mensal?</label>
+          <select id="renda">
+            <option value="">Selecione sua faixa de renda</option>
+            <option value="ate-3k">Até R$ 3.000</option>
+            <option value="3k-6k">R$ 3.000 – R$ 6.000</option>
+            <option value="6k-10k">R$ 6.000 – R$ 10.000</option>
+            <option value="10k-20k">R$ 10.000 – R$ 20.000</option>
+            <option value="acima-20k">Acima de R$ 20.000</option>
+            <option value="nao-informar">Prefiro não informar</option>
+          </select>
+          <div class="error-msg" id="err-renda">Selecione sua faixa de renda.</div>
+        </div>
+
+        <div class="field">
+          <label>Você tem entrada disponível?</label>
+          <select id="entrada">
+            <option value="">Selecione</option>
+            <option value="nao">Não tenho entrada no momento</option>
+            <option value="ate-10k">Sim, até R$ 10.000</option>
+            <option value="10k-30k">Sim, R$ 10.000 – R$ 30.000</option>
+            <option value="30k-50k">Sim, R$ 30.000 – R$ 50.000</option>
+            <option value="acima-50k">Sim, acima de R$ 50.000</option>
+          </select>
+          <div class="error-msg" id="err-entrada">Selecione uma opção.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(2)">← Voltar</button>
+          <button class="btn-next" onclick="nextStep(2)">Continuar <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step-3">
+        <div class="step-num">Passo 3 de 4</div>
+        <div class="step-title">Qual é o seu objetivo?</div>
+        <div class="step-subtitle">Para qual finalidade deseja utilizar a carta de crédito?</div>
+
+        <label style="margin-bottom:12px;display:block;">Finalidade do consórcio</label>
+        <div class="radio-group cols-3">
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-imovel" value="Imóvel Residencial">
+            <label for="fin-imovel"><span class="icon">🏠</span>Imóvel Residencial</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-terreno" value="Terreno">
+            <label for="fin-terreno"><span class="icon">🌱</span>Terreno</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-dividas" value="Pagar Dívidas">
+            <label for="fin-dividas"><span class="icon">💳</span>Pagar Dívidas</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-auto" value="Automóvel">
+            <label for="fin-auto"><span class="icon">🚗</span>Automóvel</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-moto" value="Moto">
+            <label for="fin-moto"><span class="icon">🏍️</span>Moto</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="finalidade" id="fin-pesado" value="Veículo Pesado">
+            <label for="fin-pesado"><span class="icon">🚛</span>Veículo Pesado</label>
+          </div>
+        </div>
+        <div class="error-msg" id="err-finalidade">Selecione a finalidade do consórcio.</div>
+
+        <div class="field" style="margin-top:20px;">
+          <label>Qual valor aproximado deseja?</label>
+          <select id="valor">
+            <option value="">Selecione o valor aproximado</option>
+            <option value="ate-25k">Até R$ 25.000</option>
+            <option value="25k-50k">R$ 25.000 – R$ 50.000</option>
+            <option value="50k-100k">R$ 50.000 – R$ 100.000</option>
+            <option value="100k-200k">R$ 100.000 – R$ 200.000</option>
+            <option value="200k-400k">R$ 200.000 – R$ 400.000</option>
+            <option value="400k-700k">R$ 400.000 – R$ 700.000</option>
+            <option value="acima-700k">Acima de R$ 700.000</option>
+          </select>
+          <div class="error-msg" id="err-valor">Selecione o valor desejado.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(3)">← Voltar</button>
+          <button class="btn-next" onclick="nextStep(3)">Continuar <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" id="step-4">
+        <div class="step-num">Passo 4 de 4</div>
+        <div class="step-title">Última pergunta!</div>
+        <div class="step-subtitle">Isso nos ajuda a adaptar a conversa ao seu perfil.</div>
+
+        <label style="margin-bottom:12px;display:block;">Você já comprou algum consórcio contemplado?</label>
+        <div class="radio-group">
+          <div class="radio-card">
+            <input type="radio" name="conhece" id="con-sim" value="Sim, já comprei">
+            <label for="con-sim"><span class="icon">✅</span>Sim, já comprei</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="conhece" id="con-nao" value="Não, nunca contemplei um!">
+            <label for="con-nao"><span class="icon">🙅</span>Não, e nunca ouvi falar sobre!</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="conhece" id="con-ouviu" value="Nunca comprei, mas já ouvi falar">
+            <label for="con-ouviu"><span class="icon">👂</span>Nunca comprei, mas já ouvi falar</label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="conhece" id="con-indicacao" value="Tenho uma indicação de cliente interessado">
+            <label for="con-indicacao"><span class="icon">🤝</span>Tenho uma indicação de cliente interessado</label>
+          </div>
+        </div>
+        <div class="error-msg" id="err-conhece">Por favor, selecione uma opção.</div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevStep(4)">← Voltar</button>
+          <button class="btn-next" onclick="submitForm()">🔒 Enviar e falar com especialista</button>
+        </div>
+        <p class="disclaimer">Ao enviar, você autoriza o contato via WhatsApp. Não compartilhamos seus dados.</p>
+      </div>
+
+    </div><!-- /form-area -->
+
+    <!-- SUCCESS -->
+    <div id="success-screen">
+      <div class="success-icon">🎉</div>
+      <h2>Tudo certo, <span id="success-name"></span>!</h2>
+      <p>Suas informações foram recebidas com sucesso.<br>Em breve um especialista entrará em contato para apresentar a melhor opção para você.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CONFIG = { wppNumber: '5548999999999' }; // ← TROQUE pelo número do especialista
+
+const lblIds = ['lbl-1','lbl-2','lbl-3','lbl-4'];
+const progressPct = ['14%','38%','63%','88%'];
+
+function updateProgress(step) {
+  document.getElementById('progress-fill').style.width = progressPct[step - 1];
+  lblIds.forEach((id, i) => document.getElementById(id).classList.toggle('active', i < step));
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  updateProgress(n);
+}
+
+function prevStep(n) { showStep(n - 1); }
+
+// ── CPF ──────────────────────────────────────────────────────────────────────
+function applyMask(v) {
+  v = v.replace(/\D/g,'').slice(0,11);
+  if (v.length > 9) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  if (v.length > 6) return v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  if (v.length > 3) return v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  return v;
+}
+
+function isValidCPF(str) {
+  const d = str.replace(/\D/g,'');
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  let s = 0;
+  for (let i = 0; i < 9; i++) s += +d[i] * (10 - i);
+  let r = (s * 10) % 11; if (r >= 10) r = 0;
+  if (r !== +d[9]) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += +d[i] * (11 - i);
+  r = (s * 10) % 11; if (r >= 10) r = 0;
+  return r === +d[10];
+}
+
+const cpfEl   = document.getElementById('cpf');
+const cpfIcon = document.getElementById('cpf-icon');
+const errCpf  = document.getElementById('err-cpf');
+
+cpfEl.addEventListener('input', function() {
+  this.value = applyMask(this.value);
+  const digits = this.value.replace(/\D/g,'');
+  this.classList.remove('cpf-ok','field-error');
+  cpfIcon.textContent = '';
+  errCpf.classList.remove('show');
+  if (digits.length === 11) {
+    if (isValidCPF(this.value)) {
+      this.classList.add('cpf-ok');
+      cpfIcon.textContent = '✅';
+    } else {
+      this.classList.add('field-error');
+      cpfIcon.textContent = '❌';
+      errCpf.classList.add('show');
+    }
+  }
+});
+
+// ── VALIDATION ────────────────────────────────────────────────────────────────
+function setErr(fid, eid, bad) {
+  document.getElementById(fid)?.classList.toggle('field-error', bad);
+  document.getElementById(eid)?.classList.toggle('show', bad);
+  return !bad;
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    const nome = document.getElementById('nome').value.trim();
+    const ok1 = setErr('nome','err-nome', nome.split(' ').filter(Boolean).length < 2);
+    const cpfOk = isValidCPF(cpfEl.value);
+    if (!cpfOk) { cpfEl.classList.add('field-error'); errCpf.classList.add('show'); cpfIcon.textContent = '❌'; }
+    return ok1 && cpfOk;
+  }
+  if (n === 2) {
+    return setErr('renda','err-renda', !document.getElementById('renda').value) &
+           setErr('entrada','err-entrada', !document.getElementById('entrada').value);
+  }
+  if (n === 3) {
+    const fin = !!document.querySelector('input[name="finalidade"]:checked');
+    document.getElementById('err-finalidade').classList.toggle('show', !fin);
+    return (fin & setErr('valor','err-valor', !document.getElementById('valor').value)) === 1;
+  }
+  if (n === 4) {
+    const ok = !!document.querySelector('input[name="conhece"]:checked');
+    document.getElementById('err-conhece').classList.toggle('show', !ok);
+    return ok;
+  }
+  return true;
+}
+
+function nextStep(n) {
+  if (validateStep(n) && n < 4) showStep(n + 1);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+function submitForm() {
+  if (!validateStep(4)) return;
+
+  const sel = id => { const e = document.getElementById(id); return e.options[e.selectedIndex].text; };
+  const rad = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+
+  const data = {
+    nome:      document.getElementById('nome').value.trim(),
+    cpf:       document.getElementById('cpf').value.trim(),
+    renda:     sel('renda'),
+    entrada:   sel('entrada'),
+    finalidade: rad('finalidade'),
+    valor:     sel('valor'),
+    perfil:    rad('conhece'),
+    data_hora: new Date().toLocaleString('pt-BR')
+  };
+
+  // Show success
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('success-name').textContent = data.nome.split(' ')[0];
+
+  // CPF mascarado para o WhatsApp
+  const cpfM = data.cpf.replace(/(\d{3})\.\d{3}\.\d{3}(-\d{2})/, '$1.***.***$2');
+
+  // Progress 100%
+  document.getElementById('progress-fill').style.width = '100%';
+  lblIds.forEach(id => document.getElementById(id).classList.add('active'));
+
+  // WhatsApp message
+  const msg =
+    `Olá! Para darmos continuidade, me chamo *${data.nome}*, portador do CPF: *${cpfM}*. 😊`;
+
+  setTimeout(() => {
+    window.open(`https://wa.me/${CONFIG.wppNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 600);
+
+  console.log('Lead:', JSON.stringify(data, null, 2));
+
+  /* Webhook (descomente para ativar):
+  fetch('https://SEU_WEBHOOK', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  */
+}
+</script>
+</body>
+</html>
